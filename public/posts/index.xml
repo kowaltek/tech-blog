@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on My tech blog</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on My tech blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© [Mateusz Kowalke](changeme) &amp; [risotto contributors](https://github.com/joeroe/risotto/graphs/contributors).</copyright>
+    <lastBuildDate>Sat, 08 Feb 2025 12:42:36 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go OTel Logging</title>
+      <link>http://localhost:1313/posts/go-otel-logging/</link>
+      <pubDate>Sat, 08 Feb 2025 12:42:36 +0100</pubDate>
+      <guid>http://localhost:1313/posts/go-otel-logging/</guid>
+      <description>OTel logging in Go To start with let&amp;rsquo;s quickly review the conceptual flow of logs from the creation (we&amp;rsquo;ll be using slog package) to the moment they&amp;rsquo;re sent to a collector or a backend.</description>
+    </item>
+  </channel>
+</rss>
