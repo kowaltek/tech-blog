@@ -1,8 +1,7 @@
 baseURL = "https://risotto.joeroe.io"
 theme = "risotto"
-title = "My tech blog"
+title = "Kowaltek blog"
 author = "Mateusz Kowalke"
-copyright = "© [Mateusz Kowalke](changeme) & [risotto contributors](https://github.com/joeroe/risotto/graphs/contributors)."
 paginate = 3
 languageCode = "en"
 DefaultContentLanguage = "en"
@@ -26,33 +25,15 @@ title = "Mateusz Kowalke"
 description = "It's a miracle it works."
 logo_image = "gopher.png"
 
-# Sidebar: social links
-# Available icon sets:
-# * FontAwesome 6 <https://fontawesome.com/> ('fa-brands', 'fa-normal', or 'fa-solid' for brands)
-# * Academicons <https://jpswalsh.github.io/academicons> ('ai ai-')
-
 [[params.socialLinks]]
 icon = "fa-brands fa-github"
 title = "GitHub"
-url = "https://github.com/joeroe/risotto"
+url = "https://github.com/mateuszkowalke"
 
 [[params.socialLinks]]
 icon = "fa-solid fa-envelope"
 title = "Email"
-url = "mailto:example@example.com"
-
-[[params.socialLinks]]
-icon = "ai ai-orcid"
-title = "ORCID"
-url = "https://orcid.org/0000-0001-2345-6789"
-
-[menu]
-
-  [[menu.main]]
-    identifier = "about"
-    name = "About"
-    url = "/about/"
-    weight = 10
+url = "mailto:mateusz.kowalke@gmail.com"
 
 [taxonomies]
 category = "categories"
