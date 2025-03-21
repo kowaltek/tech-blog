@@ -1,4 +1,4 @@
-baseURL = "https://risotto.joeroe.io"
+baseURL = "https://kowaltek.com"
 theme = "risotto"
 title = "Kowaltek blog"
 author = "Mateusz Kowalke"
@@ -28,7 +28,7 @@ logo_image = "gopher.png"
 [[params.socialLinks]]
 icon = "fa-brands fa-github"
 title = "GitHub"
-url = "https://github.com/mateuszkowalke"
+url = "https://github.com/kowaltek"
 
 [[params.socialLinks]]
 icon = "fa-solid fa-envelope"
