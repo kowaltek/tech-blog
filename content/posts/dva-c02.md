@@ -143,6 +143,8 @@ Integrates with many other AWS services.
 
 # EC2
 
+When talking about migration from on-prem legacy solutions, EC2 is usually the best option.
+
 ### EBS (Elastic Block Store)
 
 Highly available - they are automatically replicated within one AZ to protect against hardware failures.
@@ -189,6 +191,8 @@ Classic load balancer supports `x-forwarded-for` headers and sticky sessions.
 
 HTTP status 504 (gateway timeout) usually means when the application fails to respond (wrong configuration, application error, etc.).
 
+ELB is the best option for providing scalability at low cost.
+
 ### EC2 Image Builder
 
 Allows to create virtual machine images (AMIs) and docker containers.
@@ -202,6 +206,10 @@ Image recipe can be version controlled.
 It consists of base image and build components.
 
 To use the AMI in different region, it has to be copied there.
+
+### VPC
+
+To enable monitoring of all incoming and outgoint IP traffic we can create a VPC Flow Log.
 
 # S3
 
@@ -310,6 +318,9 @@ There are three types of encryption for S3:
  - Server side (enabled by default)
  - Client side (objects are encrypted before being sent to S3)
 
+One object can be encrypted only using either server side or client side encryption.
+In transit encryption can be used always.
+
 There are three types of keys we can use for server side encryption:
 
  - SSE-S3 (key managed by S3 - AES 256)
@@ -326,6 +337,18 @@ We can set notifications to be sent on S3 events. notifications can be sent to l
 
 Prefixes used in notifications shouldn't start with `/` character for first folder. Many characters - including `=` require special handling and have different behaviour when setting from console than when setting using cdk for example.
 The way to encode such characters when setting prefix or suffix with cdk is to do it manually.
+
+### S3 Select
+
+S3 Select is a feature that allows you to retrieve only a subset of data from an S3 object using simple SQL expressions.
+It works directly on objects stored in S3 without needing to retrieve the entire file.
+
+Key characteristics differentiating it from Athena:
+
+ - works on individual S3 objects (CSV, JSON, Parquet),
+ - uses a subset of SQL (simple WHERE clauses, column selection),
+ - processes data directly within S3,
+ - best for simple filtering of individual files.
 
 ### AWS Snow family
 
@@ -384,6 +407,16 @@ Sections of template:
  - Resources (the only mandatory section),
  - Outputs.
 
+The parameter that allows us to add inline lamba code is called `ZipFile`.
+The lambda resource type is called `AWS::Lambda::Function`.
+
+### StackSets
+
+They extend the functionality of stacks by enabling you to create, update,
+or delete stacks across multiple accounts and regions with a single operation.
+Using an administrator account, you define and manage an AWS CloudFormation template,
+and use the template as the basis for provisioning stacks into selected target accounts across specified regions.
+
 # AWS CDK
 
 For development purposes use `cdk deploy --hotswap` - this skips hitting cloud formation API and instead hits APIs for changed resources directly. Saves a lot of time. Even better than that is to use `cdk watch` which uses `--hotswap` flag by default. To disable it pass `--no-hotswap` flag.
@@ -404,7 +437,7 @@ For example create a nested loop - one level for the environments, second level 
 Works with EC2 and on-premises servers.
 It's a hybrid service (cloud and on-premises).
 Needs CodeDeploy agent installed on the instances.
-Can allow for graduall move from on-premises to cloud.
+Can allow for gradual move from on-premises to cloud.
 
 There are two types of deployments supported: rolling and blue-green.
 
@@ -417,6 +450,11 @@ In blue/green deployments the 'green' refers to new instances with new version o
 The new revision of the app is being run on new infra, so there's no reduced capacity.
 Once all traffic is directed to new version of the app, the 'blue' infra is retired.
 Until we don't remove 'blue' version, we can easily roll-back.
+
+For troubleshooting and rolling back potential bad deployments we can:
+
+ - configure AWS CodeDeploy to automatically rollback on failure,
+ - invoke a function in AWS Lambda for error handling and notifications.
 
 #### AppSpec file
 
@@ -527,6 +565,20 @@ Used by ECS and Fargate.
 # AWS lambda
 
 Virtual functions running on demand. They are limited by the time of execution and the memory used. Payment model is per request and compute time, with very generous free tier. Easy monitoring through CloudWatch. There is a possibility to run docker images on lambda as Lambda Docker Images (the image has to implement Lambda Runtime API). Max invocation time 15 minutes.
+
+### Versions and Aliases
+
+When publishing new versions of lambda, we create a snapshot of it's code and configuration.
+We can then create an alias routing requests to that version (eg. version `1`).
+When we want to publish a new version (`2`) of lambda,
+we can gradually switch to new version using (alias is named `production`):
+
+```bash
+aws lambda update-alias \
+  --function-name my-function \
+  --name production \
+  --routing-config '{"AdditionalVersionWeights":{"2":0.1}}'
+```
 
 ### Invocation types
 
@@ -662,6 +714,7 @@ There are 2 types of express workflows:
 
 It needs SDK for application instrumentation and an agent running on the system.
 For ECS, the agent has to be installed in it's own container.
+In order to communicate with the X-Ray Daemon, we need to open Port 2000 on UDP.
 We can use annotations to add key-value data to traces.
 
 # DynamoDB
@@ -907,6 +960,14 @@ to enable decryption of data encrypted with key's previous versions.
 AWS Certificate Manager is used to manage SSL/TLS certificates.
 For a cerificate to be used by CloudFront, it has to be created in `us-east-1` region.
 
+## CloudHSM
+
+Provides FIPS 140-2 Level 3 validated HSMs and gives customers exclusive control over their HSMs,
+which means only the customer has access to and control of the cryptographic keys.
+AWS manages the hardware availability and monitoring,
+but does not have access to your keys or key material.
+This makes CloudHSM the most appropriate choice when strict compliance and control are required.
+
 # SQS
 
 It's a message queue service.
@@ -1050,6 +1111,12 @@ Allows access after successful authentication with web-base identity provider li
 The access token? from IdP can be traded for temporary AWS credentials.
 The temporary credentials map to a role in IAM.
 
+## SDK credentials for on-prem servers
+
+Generally, when you want to give access to the SDK you never want to be manually placing the access key and secret onto your server.
+However, when you are not using AWS you'll need to store the access key and secret in a configuration file,
+in environment variables or in the ~/.aws/credentials file.
+
 # AWS CloudWatch
 
 CloudWatch can monitor many AWS services.
@@ -1090,6 +1157,14 @@ and it can be configured to lower it even to 1 second (high resolution metrics).
 
 We can create an alarm that watches the specified metrics.
 We set tresholds, which when reached, cause a specific action (eg. send notification).
+
+We can specify the amount of consecutive intervals to check by setting `Evaluation Periods`.
+Then we can set `Datapoints to Alarm`, which defines in how many of the evaluation periods the metric has to be crossed to trigger the alarm.
+For example if we set `Evaluation Periods` to 5 and `Datapoints to Alarm` to 2,
+then the metric would have to be above the treshold for 2 out of 5 consecutive intervals to trigger the alert.
+This is calle the `M out of N` pattern.
+To set the alarm to be triggered if the treshold is crossed for `N` evaluation periods,
+we simply need to set both parameters to `N`.
 
 ### CludWatch API
 
